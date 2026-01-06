@@ -1,44 +1,45 @@
+
 <!DOCTYPE html>
 <html lang="ru">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Сортировка магазинов гипермаркета по ШО и этажу</title>
-  <!-- <link rel="shortcut icon" href="images/giper.jpg" type="image/x-icon"> -->
+  <title>Сортировка магазинов</title>
   <link rel="stylesheet" href="style.css">
-  
-  <!-- Подключаем библиотеки для создания PDF (pdfmake) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
-
   <script src="script.js" defer></script>
 </head>
 
 <body>
 
-  <h2>Сортировка магазинов гипермаркета по ШО и этажу 🏬</h2>
-  
-  <div class="container">
-    <textarea id="input" placeholder="Введите номера магазинов через запятую, пробел или с новой строки..."></textarea>
-  
-    <div class="buttons">
-      <button onclick="sortBySHO()">Отсортировать</button>
-      <button onclick="copyResult()">Скопировать</button>
-      <button class="clear-btn" onclick="clearInput()">Очистить</button>
-    </div>
-  
-    <div class="result" id="output"></div>
-  
-    <div class="links">
-      <a href="#" onclick="alert('Картинка подвала')">🔹Подвал</a>
-      <a href="#" onclick="alert('Картинка 1 этажа')">🔹 1-этаж</a>
-      <a href="#" onclick="alert('Картинка 2 этажа')">🔹 2-этаж</a>
-      
-      <!-- Изменили ссылку на кнопку вызова функции -->
-      <a href="#" onclick="generatePDF(); return false;" style="background: #ff4d4d; color: white;">📄 Скачать список PDF</a>
+  <!-- Блок управления (скроется при печати) -->
+  <div class="no-print">
+    <h2>Сортировка магазинов гипермаркета 🏬</h2>
+    
+    <div class="container">
+      <textarea id="input" placeholder="Введите номера магазинов..."></textarea>
+    
+      <div class="buttons">
+        <button onclick="sortBySHO()">Отсортировать</button>
+        <button onclick="copyResult()">Скопировать</button>
+        <button class="clear-btn" onclick="clearInput()">Очистить</button>
+      </div>
+    
+      <div class="result" id="output"></div>
+    
+      <div class="links">
+        <a href="#" onclick="alert('Нет картинки')">🔹Подвал</a>
+        <a href="#" onclick="alert('Нет картинки')">🔹 1-этаж</a>
+        <a href="#" onclick="alert('Нет картинки')">🔹 2-этаж</a>
+        
+        <!-- Кнопка теперь вызывает функцию подготовки к печати -->
+        <a href="#" onclick="prepareAndPrint()" style="background: #ff4d4d; color: white;">📄 Скачать список (PDF)</a>
+      </div>
     </div>
   </div>
+
+  <!-- Скрытый блок, который появится ТОЛЬКО при печати/скачивании -->
+  <div id="print-area" class="print-only"></div>
 
 </body>
 </html>
