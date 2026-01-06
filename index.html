@@ -5,9 +5,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Сортировка магазинов гипермаркета по ШО и этажу</title>
-  <!-- Если у вас есть иконка, положите её рядом и раскомментируйте строку ниже -->
   <!-- <link rel="shortcut icon" href="images/giper.jpg" type="image/x-icon"> -->
   <link rel="stylesheet" href="style.css">
+  
+  <!-- Подключаем библиотеки для создания PDF (pdfmake) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+
   <script src="script.js" defer></script>
 </head>
 
@@ -26,13 +30,13 @@
   
     <div class="result" id="output"></div>
   
-    <!-- Ссылки на изображения и PDF. Замените href на пути к вашим реальным файлам, если они есть -->
     <div class="links">
-      <a href="#" onclick="alert('Файл изображения подвала отсутствует')">🔹Подвал</a>
-      <a href="#" onclick="alert('Файл изображения 1-го этажа отсутствует')">🔹 1-этаж</a>
-      <a href="#" onclick="alert('Файл изображения 2-го этажа отсутствует')">🔹 2-этаж</a>
+      <a href="#" onclick="alert('Картинка подвала')">🔹Подвал</a>
+      <a href="#" onclick="alert('Картинка 1 этажа')">🔹 1-этаж</a>
+      <a href="#" onclick="alert('Картинка 2 этажа')">🔹 2-этаж</a>
       
-      <a href="#" onclick="alert('PDF файл отсутствует')">Скачать PDF</a>
+      <!-- Изменили ссылку на кнопку вызова функции -->
+      <a href="#" onclick="generatePDF(); return false;" style="background: #ff4d4d; color: white;">📄 Скачать список PDF</a>
     </div>
   </div>
 
