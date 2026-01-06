@@ -1,6 +1,6 @@
-
-/* ----------  БАЗА ДАННЫХ  ---------- */
-    const shopToSHO = {
+/* ----------  БАЗА ДАННЫХ (оставьте как было) ---------- */
+const shopToSHO = {
+    // ... (весь ваш код базы данных оставьте здесь) ...
       // ШО-1 (подвал)
       1: "ШО-1 (подвал)", 2: "ШО-1 (подвал)", 3: "ШО-1 (подвал)", 4: "ШО-1 (подвал)",
       23: "ШО-1 (подвал)", 26: "ШО-1 (подвал)", 
@@ -110,153 +110,112 @@
       334: "ШО-4 (2-этаж)", 333: "ШО-4 (2-этаж)",
       332: "ШО-4 (2-этаж)", 331: "ШО-4 (2-этаж)", 330: "ШО-4 (2-этаж)", 329: "ШО-4 (2-этаж)",
       328: "ШО-4 (2-этаж)", 327: "ШО-4 (2-этаж)", 354: "ШО-4 (2-этаж)",
-    };
+};
 
-    /* ----------  ОСНОВНАЯ ЛОГИКА  ---------- */
-   let lastResult = "";
+/* ----------  ОСНОВНАЯ ЛОГИКА  ---------- */
+let lastResult = "";
 
-   function sortBySHO() {
-     const input = document.getElementById("input").value;
-     const shops = input
-       .split(/[\n, ,]+/)
-       .map((s) => s.trim().toLowerCase())
-       .filter((s) => s !== "");
+function sortBySHO() {
+  const input = document.getElementById("input").value;
+  const shops = input
+    .split(/[\n, ,]+/)
+    .map((s) => s.trim().toLowerCase())
+    .filter((s) => s !== "");
 
-     const shoMap = {};
-     const notFound = [];
+  const shoMap = {};
+  const notFound = [];
 
-     for (const shop of shops) {
-       const sho = shopToSHO[shop];
-       if (!sho) {
-         notFound.push(shop);
-         continue;
-       }
-       if (!shoMap[sho]) shoMap[sho] = [];
-       shoMap[sho].push(shop);
-     }
+  for (const shop of shops) {
+    const sho = shopToSHO[shop];
+    if (!sho) {
+      notFound.push(shop);
+      continue;
+    }
+    if (!shoMap[sho]) shoMap[sho] = [];
+    shoMap[sho].push(shop);
+  }
 
-     const sortedKeys = Object.keys(shoMap).sort((a, b) => {
-       const floorA = a.includes("подвал") ? 0 : a.includes("1-этаж") ? 1 : 2;
-       const floorB = b.includes("подвал") ? 0 : b.includes("1-этаж") ? 1 : 2;
-       if (floorA !== floorB) return floorA - floorB;
-       const shoNumA = parseInt(a.match(/\d+/)[0]);
-       const shoNumB = parseInt(b.match(/\d+/)[0]);
-       return shoNumA - shoNumB;
-     });
+  const sortedKeys = Object.keys(shoMap).sort((a, b) => {
+    const floorA = a.includes("подвал") ? 0 : a.includes("1-этаж") ? 1 : 2;
+    const floorB = b.includes("подвал") ? 0 : b.includes("1-этаж") ? 1 : 2;
+    if (floorA !== floorB) return floorA - floorB;
+    const shoNumA = parseInt(a.match(/\d+/)[0]);
+    const shoNumB = parseInt(b.match(/\d+/)[0]);
+    return shoNumA - shoNumB;
+  });
 
-     let result = "";
-     for (const sho of sortedKeys) {
-       result += `${sho}: ${shoMap[sho].join(", ")}\n`;
-     }
+  let result = "";
+  for (const sho of sortedKeys) {
+    result += `${sho}: ${shoMap[sho].join(", ")}\n`;
+  }
 
-     if (notFound.length) {
-       result +=
-         "\n⚠️ Эти магазины не отключаются отдельно:\n" + notFound.join(", ");
-     }
+  if (notFound.length) {
+    result +=
+      "\n⚠️ Эти магазины не отключаются отдельно:\n" + notFound.join(", ");
+  }
 
-     lastResult = result || "Нет данных для отображения";
-     document.getElementById("output").textContent = lastResult;
-   }
+  lastResult = result || "Нет данных для отображения";
+  document.getElementById("output").textContent = lastResult;
+}
 
-   function copyResult() {
-     if (!lastResult) {
-       alert("Нечего копировать");
-       return;
-     }
-     navigator.clipboard.writeText(lastResult).then(() => {
-       alert("Результат скопирован в буфер обмена!");
-     });
-   }
+function copyResult() {
+  if (!lastResult) {
+    alert("Нечего копировать");
+    return;
+  }
+  navigator.clipboard.writeText(lastResult).then(() => {
+    alert("Результат скопирован в буфер обмена!");
+  });
+}
 
-   function clearInput() {
-     document.getElementById("input").value = "";
-     document.getElementById("output").textContent = "";
-     lastResult = "";
-   }
+function clearInput() {
+  document.getElementById("input").value = "";
+  document.getElementById("output").textContent = "";
+  lastResult = "";
+}
 
-   /* ----------  ГЕНЕРАЦИЯ PDF  ---------- */
-   function generatePDF() {
-     // 1. Группируем ВСЕ данные из базы по ШО
-     const allDataMap = {};
-     
-     // Перебираем объект shopToSHO
-     for (const [shop, location] of Object.entries(shopToSHO)) {
-        if (!allDataMap[location]) {
-            allDataMap[location] = [];
-        }
-        allDataMap[location].push(shop);
-     }
+/* ----------  ЛОГИКА ПЕЧАТИ (НОВАЯ)  ---------- */
+function prepareAndPrint() {
+  const printArea = document.getElementById('print-area');
+  
+  // 1. Группируем данные
+  const allDataMap = {};
+  for (const [shop, location] of Object.entries(shopToSHO)) {
+      if (!allDataMap[location]) allDataMap[location] = [];
+      allDataMap[location].push(shop);
+  }
 
-     // 2. Сортируем ключи (Этажи и ШО)
-     const sortedKeys = Object.keys(allDataMap).sort((a, b) => {
-       const floorA = a.includes("подвал") ? 0 : a.includes("1-этаж") ? 1 : 2;
-       const floorB = b.includes("подвал") ? 0 : b.includes("1-этаж") ? 1 : 2;
-       if (floorA !== floorB) return floorA - floorB;
-       
-       const shoNumA = parseInt(a.match(/\d+/)[0]);
-       const shoNumB = parseInt(b.match(/\d+/)[0]);
-       return shoNumA - shoNumB;
-     });
+  // 2. Сортируем
+  const sortedKeys = Object.keys(allDataMap).sort((a, b) => {
+      const floorA = a.includes("подвал") ? 0 : a.includes("1-этаж") ? 1 : 2;
+      const floorB = b.includes("подвал") ? 0 : b.includes("1-этаж") ? 1 : 2;
+      if (floorA !== floorB) return floorA - floorB;
+      const shoNumA = parseInt(a.match(/\d+/)[0]);
+      const shoNumB = parseInt(b.match(/\d+/)[0]);
+      return shoNumA - shoNumB;
+  });
 
-     // 3. Формируем структуру документа для pdfmake
-     const content = [];
-     
-     content.push({ text: 'Справочник магазинов и ШО', style: 'header' });
-     content.push({ text: 'Гипермаркет', style: 'subheader' });
-     content.push({ text: '\n' }); // Отступ
+  // 3. Формируем HTML для печати
+  let html = `<div class="print-header">Справочник магазинов и ШО</div>`;
+  
+  sortedKeys.forEach(location => {
+      const shops = allDataMap[location].sort((a,b) => 
+          a.toString().localeCompare(b.toString(), undefined, {numeric: true})
+      );
+      html += `
+        <div class="print-location">${location}</div>
+        <div class="print-list">Магазины: ${shops.join(', ')}</div>
+      `;
+  });
 
-     sortedKeys.forEach(location => {
-         // location выглядит как "ШО-1 (1-этаж)"
-         const shops = allDataMap[location].sort((a,b) => 
-             a.toString().localeCompare(b.toString(), undefined, {numeric: true})
-         );
-         
-         content.push({ text: location, style: 'locationTitle' });
-         content.push({ 
-             text: `Магазины: ${shops.join(', ')}`, 
-             style: 'shopList' 
-         });
-         content.push({ text: '\n' });
-     });
+  html += `
+    <div class="print-warning">
+      ВАЖНО: Все номера магазинов, отсутствующие в этом списке, 
+      НЕ ИМЕЮТ отдельного выключателя (ШО) и не могут быть отключены отдельно.
+    </div>
+  `;
 
-     // Добавляем раздел про неотключаемые магазины
-     content.push({ text: '____________________________________', margin: [0, 10, 0, 10] });
-     content.push({ text: 'ВАЖНО:', style: 'locationTitle', color: 'red' });
-     content.push({ 
-         text: 'Все номера магазинов, которые отсутствуют в данном списке, НЕ ИМЕЮТ отдельного выключателя (ШО) и не могут быть отключены отдельно.',
-         italics: true,
-         fontSize: 12
-     });
-
-     // 4. Определение стилей
-     const docDefinition = {
-       content: content,
-       styles: {
-         header: {
-           fontSize: 22,
-           bold: true,
-           alignment: 'center',
-           margin: [0, 0, 0, 10],
-           color: '#0078ff'
-         },
-         subheader: {
-           fontSize: 16,
-           alignment: 'center',
-           margin: [0, 0, 0, 20]
-         },
-         locationTitle: {
-           fontSize: 14,
-           bold: true,
-           color: '#333',
-           margin: [0, 5, 0, 2]
-         },
-         shopList: {
-           fontSize: 12,
-           color: '#555'
-         }
-       }
-     };
-
-     // 5. Создание и скачивание
-     pdfMake.createPdf(docDefinition).download('Spisok_Magazinov_SHO.pdf');
-   }
+  // 4. Вставляем в скрытый блок и вызываем печать
+  printArea.innerHTML = html;
+  window.print();
+    }
